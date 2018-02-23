@@ -5,7 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -29,8 +32,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(RecyclerItem holder, int position) {
-        holder.content.setText(mItems.get(position).mContent);
-        holder.number.setText(mItems.get(position).mNumber);
+        holder.content.setText(mItems.get(position).mDesc);
+        holder.number.setText("No.: "+(position+1));
+        Glide.with(holder.itemView.getContext()).load(mItems.get(position).photi).into(holder.image);
     }
 
     @Override
@@ -42,11 +46,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
         TextView number;
         TextView content;
+        ImageView image;
 
         public RecyclerItem(View itemView) {
             super(itemView);
             number = itemView.findViewById(R.id.number_view);
             content = itemView.findViewById(R.id.content_view);
+            image = itemView.findViewById(R.id.image);
 
         }
     }

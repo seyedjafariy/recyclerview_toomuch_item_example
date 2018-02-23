@@ -10,31 +10,39 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
 
+    RecyclerView recyclerView;
+    LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        List<Item> items = new LinkedList<>();
-        for (int i = 0; i < 10000; i++) {
-            String number = "something to show for example with number " + (i+1);
-            String content = "No.: "+(i+1);
-            items.add(new Item(number, content));
-        }
+//        List<Item> items = new LinkedList<>();
+//        for (int i = 0; i < 10000; i++) {
+//            String number = "something to show for example with number " + (i+1);
+//            String content = "No.: "+(i+1);
+//            items.add(new Item(number, content));
+//        }
 
-        final RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setAdapter(new RecyclerAdapter(items));
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
+         recyclerView = findViewById(R.id.recyclerView);
+        linearLayoutManager = new LinearLayoutManager(MainActivity.this);
 
+        getCharcaters();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -70,5 +78,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void getCharcaters(){
+        Call<List<BaseResponse>> itemCall = new Retrofit.Builder()
+                .baseUrl("http://bahmaniart.ir")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(Api.class)
+                .getChars();
+
+        itemCall.enqueue(new Callback<List<BaseResponse>>() {
+            @Override
+            public void onResponse(Call<List<BaseResponse>> call, Response<List<BaseResponse>> response) {
+
+                recyclerView.setAdapter(new RecyclerAdapter(response.body().get(0).action));
+                recyclerView.setLayoutManager(linearLayoutManager);
+            }
+
+            @Override
+            public void onFailure(Call<List<BaseResponse>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }
